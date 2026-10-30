@@ -2,9 +2,11 @@
 node_modules/
 .pnpm-store/
 
-# Documents & BA SRS (theo yêu cầu không commit tài liệu gốc)
+# Documents & BA SRS & Tasks (theo yêu cầu không commit tài liệu gốc & tasks)
 documents/
 docs/
+tasks/
+task/
 *.docx
 *.pdf
 
@@ -25,3 +27,4 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+
