@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Documents & BA SRS (theo yêu cầu không commit tài liệu gốc)
+documents/
+docs/
+*.docx
+*.pdf
+
+# Environment & Secrets
+.env
+.env*.local
+*.pem
+*.key
+
+# Build outputs & caches
+dist/
+build/
+.next/
+.turbo/
+.cache/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
