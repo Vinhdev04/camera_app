@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
-import { colors, radius, spacing } from '../tokens';
+import { colors, radius, spacing } from '@/shared/styles/tokens';
 
 export interface CardProps {
   children: React.ReactNode;

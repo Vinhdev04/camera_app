@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, radius, spacing, typography } from '../tokens';
-import { CameraStatus } from '@/contracts';
+import { colors, radius, spacing, typography } from '@/shared/styles/tokens';
+import { CameraStatus } from '@/shared/types';
 
 export interface StatusBadgeProps {
   status: CameraStatus;

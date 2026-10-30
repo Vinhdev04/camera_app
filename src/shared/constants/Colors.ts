@@ -15,6 +15,8 @@ export const Colors = {
   cardBg: uiKitColors.surface,
   activeTab: uiKitColors.primary,
   inactiveTab: uiKitColors.textSecondary,
+  borderLight: '#334155',
+  primaryLight: '#3B82F6',
 };
 
 export default Colors;

@@ -8,7 +8,7 @@ import {
   TextInputProps,
   ViewStyle,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '../tokens';
+import { colors, radius, spacing, typography } from '@/shared/styles/tokens';
 
 export interface InputProps extends TextInputProps {
   label: string;

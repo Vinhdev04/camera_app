@@ -30,10 +30,7 @@ export const AddEditCameraScreen: React.FC<AddEditCameraScreenProps> = ({
   initialCamera,
   onNavigateBack,
 }) => {
-  // Lấy hàm lưu và xoá camera từ hook useCameras
   const { saveCamera, deleteCamera } = useCameras();
-
-  // Lấy hàm kiểm tra kết nối từ hook useDiagnostics
   const { testing, steps, testConnection, resetTest } = useDiagnostics();
 
   const [name, setName] = useState(initialCamera?.name || '');
@@ -80,12 +77,12 @@ export const AddEditCameraScreen: React.FC<AddEditCameraScreenProps> = ({
       transport,
     });
 
-    if (result.success) {
+    if (result.isSuccess) {
       setTestResultMsg(
-        `Kết nối thành công! Codec: ${result.streamInfo?.codec || 'H.264'} (${result.streamInfo?.resolution || '1080p'})`
+        `Kết nối thành công! Codec: ${result.detectedCodec || 'H.264'} (1080p)`
       );
     } else {
-      setTestResultMsg(`Kiểm tra thất bại: ${result.summary}`);
+      setTestResultMsg(`Kiểm tra thất bại: ${result.error || 'Không thể kết nối'}`);
     }
   };
 
@@ -265,13 +262,15 @@ export const AddEditCameraScreen: React.FC<AddEditCameraScreenProps> = ({
           {steps.map((s, idx) => (
             <View key={idx} style={styles.stepRow}>
               <Text style={styles.stepName}>
-                {s.step === 'lan_ping'
-                  ? '1. Ping địa chỉ IP nội bộ'
-                  : s.step === 'port_check'
-                  ? '2. Kiểm tra cổng RTSP 554'
-                  : s.step === 'rtsp_describe'
-                  ? '3. Gửi lệnh RTSP DESCRIBE'
-                  : '4. Kiểm tra luồng video H.264'}
+                {s.step === 'dns'
+                  ? '1. Phân giải DNS / Kiểm tra Host'
+                  : s.step === 'tcp'
+                  ? '2. Kiểm tra cổng TCP 554'
+                  : s.step === 'options'
+                  ? '3. Gửi lệnh RTSP OPTIONS'
+                  : s.step === 'describe'
+                  ? '4. Gửi lệnh RTSP DESCRIBE'
+                  : '5. Xác thực tài khoản RTSP'}
               </Text>
               <View style={styles.stepStatusBadge}>
                 <Text
@@ -341,7 +340,7 @@ export const AddEditCameraScreen: React.FC<AddEditCameraScreenProps> = ({
             onPress={() => setDeleteModalVisible(false)}
           />
           <Button
-            style={[styles.modalBtn, { backgroundColor: Colors.danger }]}
+            style={{ ...styles.modalBtn, backgroundColor: Colors.danger }}
             title="Xoá vĩnh viễn"
             variant="primary"
             onPress={handleDelete}
@@ -353,4 +352,3 @@ export const AddEditCameraScreen: React.FC<AddEditCameraScreenProps> = ({
 };
 
 export default AddEditCameraScreen;
-

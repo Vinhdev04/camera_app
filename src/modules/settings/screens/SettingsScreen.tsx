@@ -146,7 +146,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateBack }
             onPress={() => setResetModalVisible(false)}
           />
           <Button
-            style={[styles.modalBtn, { backgroundColor: Colors.danger }]}
+            style={{ ...styles.modalBtn, backgroundColor: Colors.danger }}
             title="Xoá tất cả"
             variant="primary"
             onPress={handleConfirmReset}

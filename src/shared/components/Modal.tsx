@@ -4,10 +4,9 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '../tokens';
+import { colors, radius, spacing, typography } from '@/shared/styles/tokens';
 import { Button } from './Button';
 
 export interface ModalProps {
@@ -18,7 +17,8 @@ export interface ModalProps {
   confirmTitle?: string;
   confirmVariant?: 'primary' | 'danger';
   onConfirm?: () => void;
-  onCancel: () => void;
+  onCancel?: () => void;
+  onClose?: () => void;
   confirmLoading?: boolean;
 }
 
@@ -31,16 +31,19 @@ export const Modal: React.FC<ModalProps> = ({
   confirmVariant = 'primary',
   onConfirm,
   onCancel,
+  onClose,
   confirmLoading = false,
 }) => {
+  const handleClose = onClose || onCancel || (() => {});
+
   return (
     <RNModal
       animationType="fade"
       transparent
       visible={visible}
-      onRequestClose={onCancel}
+      onRequestClose={handleClose}
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
+      <TouchableWithoutFeedback onPress={handleClose}>
         <View style={styles.backdrop}>
           <TouchableWithoutFeedback>
             <View style={styles.dialog}>
@@ -49,23 +52,27 @@ export const Modal: React.FC<ModalProps> = ({
                 <Text style={styles.description}>{description}</Text>
               )}
               {children}
-              <View style={styles.actions}>
-                <Button
-                  style={styles.cancelBtn}
-                  title="Hủy"
-                  variant="secondary"
-                  onPress={onCancel}
-                />
-                {onConfirm && (
-                  <Button
-                    loading={confirmLoading}
-                    style={styles.confirmBtn}
-                    title={confirmTitle}
-                    variant={confirmVariant}
-                    onPress={onConfirm}
-                  />
-                )}
-              </View>
+              {(onConfirm || onCancel) && (
+                <View style={styles.actions}>
+                  {onCancel && (
+                    <Button
+                      style={styles.cancelBtn}
+                      title="Hủy"
+                      variant="secondary"
+                      onPress={onCancel}
+                    />
+                  )}
+                  {onConfirm && (
+                    <Button
+                      loading={confirmLoading}
+                      style={styles.confirmBtn}
+                      title={confirmTitle}
+                      variant={confirmVariant}
+                      onPress={onConfirm}
+                    />
+                  )}
+                </View>
+              )}
             </View>
           </TouchableWithoutFeedback>
         </View>
