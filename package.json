@@ -1,0 +1,21 @@
+{
+  "name": "uicv-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal IP Camera Viewer (UICV) - Monorepo",
+  "scripts": {
+    "start": "pnpm --filter mobile start",
+    "web": "pnpm --filter mobile web",
+    "android": "pnpm --filter mobile android",
+    "ios": "pnpm --filter mobile ios",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@11.13.1",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

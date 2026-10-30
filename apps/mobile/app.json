@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "UICV",
+    "slug": "uicv-camera-viewer",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#090D16"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.uicv.cameraviewer",
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "Ứng dụng cần quyền mạng nội bộ để tìm kiếm và kết nối trực tiếp đến camera IP của bạn."
+      }
+    },
+    "android": {
+      "package": "com.uicv.cameraviewer",
+      "adaptiveIcon": {
+        "backgroundColor": "#090D16"
+      },
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "ACCESS_WIFI_STATE",
+        "CHANGE_WIFI_MULTICAST_STATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    }
+  }
+}
