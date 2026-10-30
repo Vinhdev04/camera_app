@@ -1,21 +1,28 @@
 {
-  "name": "uicv-monorepo",
-  "version": "0.1.0",
+  "name": "cameras_vapp",
+  "version": "1.0.0",
   "private": true,
-  "description": "Universal IP Camera Viewer (UICV) - Monorepo",
+  "main": "index.ts",
   "scripts": {
-    "start": "pnpm --filter mobile start",
-    "web": "pnpm --filter mobile web",
-    "android": "pnpm --filter mobile android",
-    "ios": "pnpm --filter mobile ios",
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
-  "devDependencies": {
-    "typescript": "^5.3.3"
+  "dependencies": {
+    "expo": "~51.0.0",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.74.5",
+    "react-native-web": "~0.19.10"
   },
-  "packageManager": "pnpm@11.13.1",
-  "engines": {
-    "node": ">=20.0.0"
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "typescript": "^5.3.3"
   }
 }

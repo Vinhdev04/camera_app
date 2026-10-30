@@ -1,5 +1,0 @@
-packages:
-  - 'packages/*'
-  - 'packages/features/*'
-  - 'packages/adapters/*'
-  - 'apps/*'
