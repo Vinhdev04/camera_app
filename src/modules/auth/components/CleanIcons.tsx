@@ -284,3 +284,4 @@ export const CheckIcon: React.FC<IconProps> = ({ size = 18, color = '#10B981', s
     </View>
   );
 };
+
