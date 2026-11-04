@@ -1,16 +1,16 @@
 /**
  * @file LoginForm.tsx
- * @desc Component UI Form Đăng nhập theo sát thiết kế SCR-11 (Light Tech System)
+ * @desc Component Form Đăng nhập thiết kế chuẩn 1:1 theo bản mẫu Prototype SCR-11
  * @layer modules/auth/components
  */
 
 import React, { useState } from 'react';
 import { View, Text, Switch, TouchableOpacity, StyleSheet } from 'react-native';
-import { Button, Input } from '@/shared/components';
 import { Colors } from '@/shared/constants/Colors';
 import { Typography } from '@/shared/constants/Typography';
 import { radius, spacing } from '@/shared/styles/tokens';
 import { LoginCredentials } from '../types';
+import { AuthInput } from './AuthInput';
 
 export interface LoginFormProps {
   isLoading: boolean;
@@ -46,24 +46,27 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       {/* Banner thông báo lỗi nếu có */}
       {Boolean(errorMessage) && (
         <View style={styles.errorBanner}>
+          <Text style={styles.errorBannerIcon}>⚠️</Text>
           <Text style={styles.errorBannerText}>{errorMessage}</Text>
         </View>
       )}
 
-      {/* Trường nhập Email */}
-      <Input
+      {/* Ô nhập Email */}
+      <AuthInput
         autoCapitalize="none"
+        isRequired
         keyboardType="email-address"
-        label="Email *"
+        label="Email"
         placeholder="an.nguyen@vidu.com"
         value={email}
         onChangeText={setEmail}
       />
 
-      {/* Trường nhập Mật khẩu */}
-      <Input
+      {/* Ô nhập Mật khẩu */}
+      <AuthInput
         isPassword
-        label="Mật khẩu *"
+        isRequired
+        label="Mật khẩu"
         placeholder="Tối thiểu 8 ký tự"
         value={password}
         onChangeText={setPassword}
@@ -73,9 +76,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       <View style={styles.optionsRow}>
         <View style={styles.rememberWrap}>
           <Switch
+            ios_backgroundColor={Colors.palette.slate[200]}
+            style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
             thumbColor={Colors.white}
             trackColor={{
-              false: Colors.border,
+              false: Colors.palette.slate[200],
               true: Colors.primary,
             }}
             value={rememberMe}
@@ -86,51 +91,54 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         <TouchableOpacity
           activeOpacity={0.7}
-          style={styles.forgotBtn}
+          hitSlop={{ top: 8, bottom: 8, left: 10, right: 10 }}
           onPress={onForgotPassword}
         >
           <Text style={styles.forgotText}>Quên mật khẩu?</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Nút bấm chính Đăng nhập */}
-      <Button
+      {/* Nút bấm chính: Đăng nhập */}
+      <TouchableOpacity
+        activeOpacity={0.85}
         disabled={isLoading}
-        loading={isLoading}
-        style={styles.submitBtn}
-        title="Đăng nhập"
-        variant="primary"
+        style={[styles.submitButton, isLoading && styles.buttonDisabled]}
         onPress={handleSubmit}
-      />
+      >
+        <Text style={styles.loginIcon}>📥</Text>
+        <Text style={styles.submitButtonText}>
+          {isLoading ? 'Đang xác thực...' : 'Đăng nhập'}
+        </Text>
+      </TouchableOpacity>
 
-      {/* Vạch kẻ chia cắt LOGIN.OR */}
+      {/* Phân cách LOGIN.OR */}
       <View style={styles.orDivider}>
         <View style={styles.dividerLine} />
         <Text style={styles.orText}>LOGIN.OR</Text>
         <View style={styles.dividerLine} />
       </View>
 
-      {/* Nút đăng nhập sinh trắc học */}
+      {/* Nút sinh trắc học Face ID / Vân tay */}
       <TouchableOpacity
         activeOpacity={0.8}
         disabled={isLoading}
-        style={styles.biometricBtn}
+        style={styles.biometricButton}
         onPress={onBiometricLogin}
       >
         <Text style={styles.biometricIcon}>🪪</Text>
-        <Text style={styles.biometricText}>Dùng Face ID / Vân tay</Text>
+        <Text style={styles.biometricText}>Dùng Face ID</Text>
       </TouchableOpacity>
 
-      {/* Chú thích bảo mật chuẩn SEC-002 */}
+      {/* Ghi chú bảo mật Keychain/Keystore (SEC-002) */}
       <View style={styles.footerNoteWrap}>
         <Text style={styles.footerNote}>
           Mật khẩu lưu trong Keychain / Keystore. Không ghi log.
         </Text>
       </View>
 
-      {/* Liên kết chuyển sang tạo tài khoản */}
-      <View style={styles.switchTabWrap}>
-        <Text style={styles.switchTabText}>Chưa có tài khoản?</Text>
+      {/* Link chuyển sang đăng ký tài khoản */}
+      <View style={styles.switchTabRow}>
+        <Text style={styles.switchTabText}>Chưa có tài khoản? </Text>
         <TouchableOpacity activeOpacity={0.7} onPress={onSwitchToRegister}>
           <Text style={styles.switchTabLink}>Tạo tài khoản mới</Text>
         </TouchableOpacity>
@@ -142,35 +150,59 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   optionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.lg,
-    marginTop: -spacing.xs,
+    marginTop: 2,
   },
   rememberWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: 6,
   },
   rememberLabel: {
     ...Typography.caption,
-    color: Colors.textPrimary,
-  },
-  forgotBtn: {
-    paddingVertical: spacing.xs,
+    fontSize: 13,
+    color: Colors.palette.slate[700],
+    fontWeight: '400',
   },
   forgotText: {
     ...Typography.caption,
+    fontSize: 13,
     color: Colors.primary,
     fontWeight: '600',
   },
-  submitBtn: {
+  submitButton: {
     width: '100%',
+    minHeight: 50,
+    backgroundColor: Colors.primary,
+    borderRadius: radius.md + 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
     marginBottom: spacing.lg,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  loginIcon: {
+    fontSize: 18,
+    color: Colors.white,
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.white,
   },
   orDivider: {
     flexDirection: 'row',
@@ -181,74 +213,81 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: Colors.palette.slate[200],
   },
   orText: {
-    ...Typography.caption,
     fontSize: 10,
     fontWeight: '700',
-    color: Colors.textMuted,
-    letterSpacing: 1.5,
+    color: Colors.palette.slate[400],
+    letterSpacing: 2,
     paddingHorizontal: spacing.md,
   },
-  biometricBtn: {
+  biometricButton: {
     width: '100%',
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: radius.md,
-    minHeight: 46,
+    minHeight: 48,
+    backgroundColor: Colors.palette.slate[50],
+    borderWidth: 1.2,
+    borderColor: Colors.palette.slate[200],
+    borderRadius: radius.md + 2,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.xl,
-  },
-  biometricText: {
-    ...Typography.bodyMedium,
-    color: Colors.textPrimary,
+    marginBottom: spacing.lg + 2,
   },
   biometricIcon: {
     fontSize: 18,
   },
+  biometricText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.palette.slate[800],
+  },
   footerNoteWrap: {
     alignItems: 'center',
-    marginTop: spacing.sm,
     marginBottom: spacing.lg,
   },
   footerNote: {
-    ...Typography.caption,
     fontSize: 11,
-    color: Colors.textMuted,
+    color: Colors.palette.slate[400],
     textAlign: 'center',
     lineHeight: 16,
   },
-  switchTabWrap: {
+  switchTabRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.xs,
+    paddingVertical: spacing.xs,
   },
   switchTabText: {
-    ...Typography.body,
-    color: Colors.textSecondary,
+    fontSize: 13,
+    color: Colors.palette.slate[600],
   },
   switchTabLink: {
-    ...Typography.bodyBold,
+    fontSize: 13,
+    fontWeight: '700',
     color: Colors.primary,
   },
   errorBanner: {
-    backgroundColor: Colors.dangerSubtle || 'rgba(239, 68, 68, 0.1)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.palette.red[50],
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: Colors.borderError,
+    borderColor: Colors.palette.red[200],
     padding: spacing.md,
     marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  errorBannerIcon: {
+    fontSize: 16,
   },
   errorBannerText: {
-    ...Typography.caption,
+    flex: 1,
+    fontSize: 13,
     color: Colors.danger,
     lineHeight: 18,
+    fontWeight: '500',
   },
 });
 

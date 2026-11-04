@@ -1,6 +1,7 @@
 /**
  * @file AuthScreen.tsx
- * @desc Màn hình Đăng nhập / Đăng ký / Chế độ tài khoản chuẩn UI Prototype SCR-11
+ * @desc Màn hình Xác thực (Đăng nhập / Đăng ký / Quên mật khẩu) chuẩn theo UI Prototype SCR-11
+ * Tối ưu responsive 100% trên cả thiết bị di động (360px - 440px) và tablet/web
  * @layer modules/auth/screens
  */
 
@@ -15,16 +16,16 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
-import { commonStyles } from '@/shared/styles';
-import { Button } from '@/shared/components';
 import { Colors } from '@/shared/constants/Colors';
 import { Typography } from '@/shared/constants/Typography';
 import { radius, spacing } from '@/shared/styles/tokens';
 import { useAuth } from '../hooks/useAuth';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
+import { ForgotPasswordView } from '../components/ForgotPasswordView';
 import { LocalModeNotice } from '../components/LocalModeNotice';
-import { ForgotPasswordModal } from '../components/ForgotPasswordModal';
+
+export type AuthSubView = 'login' | 'register' | 'forgot-password';
 
 export interface AuthScreenProps {
   onNavigateBack: () => void;
@@ -39,11 +40,9 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     user,
     isAuthenticated,
     authMode,
-    authTab,
     isLoading,
     error,
     setAuthMode,
-    setAuthTab,
     clearError,
     login,
     register,
@@ -51,7 +50,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     logout,
   } = useAuth();
 
-  const [isForgotModalVisible, setIsForgotModalVisible] = useState(false);
+  const [subView, setSubView] = useState<AuthSubView>('login');
 
   // Xử lý đăng nhập thành công
   const handleLoginSubmit = async (credentials: any) => {
@@ -77,283 +76,355 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     }
   };
 
+  const getPageTitle = () => {
+    if (subView === 'register') return 'Tạo tài khoản';
+    if (subView === 'forgot-password') return 'Quên mật khẩu';
+    return 'Đăng nhập';
+  };
+
+  const getPageSubtitle = () => {
+    if (subView === 'register') return 'Khởi tạo tài khoản để sao lưu cấu hình đám mây';
+    if (subView === 'forgot-password') return 'Khôi phục quyền truy cập vào tài khoản của bạn';
+    return 'Đồng bộ cấu hình và bật truy cập từ xa';
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ flex: 1 }}
+        style={styles.keyboardContainer}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Top Navigation Bar */}
-          <View style={styles.headerNav}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={styles.backBtn}
-              onPress={onNavigateBack}
-            >
-              <Text style={styles.backIcon}>‹</Text>
-            </TouchableOpacity>
-
-            <View style={styles.roadmapBadge}>
-              <Text style={styles.roadmapBadgeText}>PHASE 4 · ROADMAP</Text>
-            </View>
-          </View>
-
-          {/* Logo & Tiêu đề thương hiệu UICV */}
-          <View style={styles.brandWrap}>
-            <View style={styles.logoRow}>
-              <View style={styles.logoIcon}>
-                <Text style={styles.logoIconText}>📹</Text>
-              </View>
-              <View>
-                <Text style={styles.logoTitle}>UICV</Text>
-                <Text style={styles.logoSubtitle}>LAN · RTSP · ONVIF</Text>
-              </View>
-            </View>
-
-            <Text style={styles.pageTitle}>
-              {authTab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}
-            </Text>
-            <Text style={styles.pageSubtitle}>
-              {authTab === 'login'
-                ? 'Đồng bộ cấu hình và bật truy cập từ xa'
-                : 'Khởi tạo tài khoản để sao lưu cấu hình đám mây'}
-            </Text>
-          </View>
-
-          {/* Bộ chọn Chế độ: Cục bộ | Tài khoản */}
-          <View style={styles.modeSegmentWrap}>
-            <View style={commonStyles.segmentContainer}>
+          <View style={styles.contentWrapper}>
+            {/* 1. Top Navigation Bar (Nút Back & Tag Roadmap) */}
+            <View style={styles.topNavRow}>
               <TouchableOpacity
-                activeOpacity={0.8}
-                style={[
-                  commonStyles.segmentItem,
-                  authMode === 'local' && commonStyles.segmentItemActive,
-                ]}
+                activeOpacity={0.7}
+                style={styles.backButton}
                 onPress={() => {
-                  clearError();
-                  setAuthMode('local');
+                  if (subView !== 'login') {
+                    clearError();
+                    setSubView('login');
+                  } else {
+                    onNavigateBack();
+                  }
                 }}
               >
-                <Text
-                  style={[
-                    commonStyles.segmentText,
-                    authMode === 'local' && commonStyles.segmentTextActive,
-                  ]}
-                >
-                  Cục bộ
-                </Text>
+                <Text style={styles.backIcon}>‹</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={[
-                  commonStyles.segmentItem,
-                  authMode === 'account' && commonStyles.segmentItemActive,
-                ]}
-                onPress={() => {
-                  clearError();
-                  setAuthMode('account');
-                }}
-              >
-                <Text
-                  style={[
-                    commonStyles.segmentText,
-                    authMode === 'account' && commonStyles.segmentTextActive,
-                  ]}
-                >
-                  Tài khoản
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Nội dung theo trạng thái */}
-          {authMode === 'local' ? (
-            <LocalModeNotice onContinueLocal={onNavigateBack} />
-          ) : isAuthenticated && user ? (
-            /* Khi người dùng đã đăng nhập thành công */
-            <View style={styles.accountCard}>
-              <View style={styles.userAvatar}>
-                <Text style={styles.userAvatarText}>👤</Text>
+              <View style={styles.roadmapTag}>
+                <Text style={styles.roadmapTagText}>PHASE 4 · ROADMAP</Text>
               </View>
-              <Text style={styles.userName}>{user.name}</Text>
-              <Text style={styles.userEmail}>{user.email}</Text>
+            </View>
 
-              <Button
-                style={styles.logoutBtn}
-                title="Đăng Xuất Tài Khoản"
-                variant="danger"
-                onPress={logout}
+            {/* 2. Cụm Logo & Nhận diện thương hiệu UICV */}
+            <View style={styles.brandHeader}>
+              <View style={styles.logoRow}>
+                <View style={styles.cameraIconBadge}>
+                  <Text style={styles.cameraIconSymbol}>📹</Text>
+                </View>
+                <View>
+                  <Text style={styles.brandName}>UICV</Text>
+                  <Text style={styles.brandSpecs}>LAN · RTSP · ONVIF</Text>
+                </View>
+              </View>
+
+              <Text style={styles.pageTitle}>{getPageTitle()}</Text>
+              <Text style={styles.pageSubtitle}>{getPageSubtitle()}</Text>
+            </View>
+
+            {/* 3. Bộ chuyển Chế độ: Cục bộ | Tài khoản (Chỉ hiển thị khi không ở màn Forgot Password) */}
+            {subView !== 'forgot-password' && (
+              <View style={styles.segmentContainer}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={[
+                    styles.segmentButton,
+                    authMode === 'local' && styles.segmentButtonActive,
+                  ]}
+                  onPress={() => {
+                    clearError();
+                    setAuthMode('local');
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      authMode === 'local' && styles.segmentTextActive,
+                    ]}
+                  >
+                    Cục bộ
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={[
+                    styles.segmentButton,
+                    authMode === 'account' && styles.segmentButtonActive,
+                  ]}
+                  onPress={() => {
+                    clearError();
+                    setAuthMode('account');
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      authMode === 'account' && styles.segmentTextActive,
+                    ]}
+                  >
+                    Tài khoản
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* 4. Nội dung theo trạng thái */}
+            {authMode === 'local' ? (
+              <LocalModeNotice onContinueLocal={onNavigateBack} />
+            ) : isAuthenticated && user ? (
+              /* Đã đăng nhập */
+              <View style={styles.userCard}>
+                <View style={styles.avatarCircle}>
+                  <Text style={styles.avatarSymbol}>👤</Text>
+                </View>
+                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.userEmail}>{user.email}</Text>
+
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.logoutButton}
+                  onPress={logout}
+                >
+                  <Text style={styles.logoutButtonText}>Đăng Xuất Tài Khoản</Text>
+                </TouchableOpacity>
+              </View>
+            ) : subView === 'forgot-password' ? (
+              /* View Quên mật khẩu */
+              <ForgotPasswordView
+                onBackToLogin={() => {
+                  clearError();
+                  setSubView('login');
+                }}
               />
-            </View>
-          ) : authTab === 'login' ? (
-            /* Form Đăng nhập */
-            <LoginForm
-              errorMessage={error}
-              isLoading={isLoading}
-              onBiometricLogin={handleBiometricSubmit}
-              onForgotPassword={() => setIsForgotModalVisible(true)}
-              onSubmit={handleLoginSubmit}
-              onSwitchToRegister={() => {
-                clearError();
-                setAuthTab('register');
-              }}
-            />
-          ) : (
-            /* Form Đăng ký */
-            <RegisterForm
-              errorMessage={error}
-              isLoading={isLoading}
-              onSubmit={handleRegisterSubmit}
-              onSwitchToLogin={() => {
-                clearError();
-                setAuthTab('login');
-              }}
-            />
-          )}
+            ) : subView === 'register' ? (
+              /* View Đăng ký tài khoản */
+              <RegisterForm
+                errorMessage={error}
+                isLoading={isLoading}
+                onSubmit={handleRegisterSubmit}
+                onSwitchToLogin={() => {
+                  clearError();
+                  setSubView('login');
+                }}
+              />
+            ) : (
+              /* View Đăng nhập (Mặc định) */
+              <LoginForm
+                errorMessage={error}
+                isLoading={isLoading}
+                onBiometricLogin={handleBiometricSubmit}
+                onForgotPassword={() => {
+                  clearError();
+                  setSubView('forgot-password');
+                }}
+                onSubmit={handleLoginSubmit}
+                onSwitchToRegister={() => {
+                  clearError();
+                  setSubView('register');
+                }}
+              />
+            )}
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* Modal Quên mật khẩu */}
-      <ForgotPasswordModal
-        visible={isForgotModalVisible}
-        onClose={() => setIsForgotModalVisible(false)}
-      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.white,
+  },
+  keyboardContainer: {
+    flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxxl,
+    flexGrow: 1,
+    paddingHorizontal: spacing.lg + 2,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.xxl,
   },
-  headerNav: {
+  contentWrapper: {
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
+  },
+  topNavRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.xs,
   },
-  backBtn: {
-    width: 38,
-    height: 38,
+  backButton: {
+    width: 36,
+    height: 36,
     borderRadius: radius.full,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    backgroundColor: Colors.palette.slate[100],
     alignItems: 'center',
     justifyContent: 'center',
   },
   backIcon: {
-    fontSize: 18,
-    color: Colors.textPrimary,
-    fontWeight: '700',
+    fontSize: 22,
+    color: Colors.palette.slate[800],
+    fontWeight: '600',
+    marginTop: -2,
   },
-  roadmapBadge: {
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: spacing.xxs + 1,
+  roadmapTag: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: radius.full,
-    backgroundColor: Colors.primarySubtle || '#FEF2F2',
+    backgroundColor: Colors.palette.red[50],
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: Colors.palette.red[200],
   },
-  roadmapBadgeText: {
-    ...Typography.badge,
+  roadmapTagText: {
     fontSize: 10,
+    fontWeight: '700',
     color: Colors.primary,
     letterSpacing: 0.8,
   },
-  brandWrap: {
-    marginTop: spacing.md,
+  brandHeader: {
+    marginTop: spacing.sm,
     marginBottom: spacing.lg,
   },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.sm + 2,
     marginBottom: spacing.md,
   },
-  logoIcon: {
-    width: 36,
-    height: 36,
+  cameraIconBadge: {
+    width: 38,
+    height: 38,
     borderRadius: radius.md,
     backgroundColor: Colors.palette.slate[900],
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoIconText: {
+  cameraIconSymbol: {
     fontSize: 18,
   },
-  logoTitle: {
-    ...Typography.bodyBold,
-    fontSize: 15,
-    color: Colors.textPrimary,
+  brandName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.palette.slate[900],
+    letterSpacing: 0.5,
   },
-  logoSubtitle: {
-    ...Typography.caption,
+  brandSpecs: {
     fontSize: 10,
-    color: Colors.textMuted,
-    letterSpacing: 1,
+    fontWeight: '600',
+    color: Colors.palette.slate[400],
+    letterSpacing: 1.5,
+    marginTop: 1,
   },
   pageTitle: {
-    ...Typography.titleLg,
-    fontSize: 26,
-    color: Colors.textPrimary,
-    marginBottom: spacing.xxs,
+    fontSize: 28,
+    fontWeight: '700',
+    color: Colors.palette.slate[900],
+    letterSpacing: -0.3,
+    marginBottom: 4,
   },
   pageSubtitle: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    lineHeight: 20,
+    fontSize: 13,
+    color: Colors.palette.slate[500],
+    lineHeight: 18,
   },
-  modeSegmentWrap: {
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
+  segmentContainer: {
+    flexDirection: 'row',
+    backgroundColor: Colors.palette.slate[100],
+    borderRadius: radius.md + 2,
+    padding: 3,
+    marginBottom: spacing.md + 2,
   },
-  accountCard: {
-    backgroundColor: Colors.surface,
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
+  },
+  segmentButtonActive: {
+    backgroundColor: Colors.palette.slate[900],
+    shadowColor: Colors.palette.slate[900],
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  segmentText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.palette.slate[600],
+  },
+  segmentTextActive: {
+    color: Colors.white,
+    fontWeight: '700',
+  },
+  userCard: {
+    backgroundColor: Colors.white,
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderWidth: 1.2,
+    borderColor: Colors.palette.slate[200],
     padding: spacing.xl,
     marginTop: spacing.md,
     alignItems: 'center',
   },
-  userAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: Colors.primarySubtle || '#FEF2F2',
+  avatarCircle: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: Colors.palette.red[50],
     borderWidth: 2,
     borderColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
-  userAvatarText: {
-    fontSize: 28,
+  avatarSymbol: {
+    fontSize: 30,
   },
   userName: {
-    ...Typography.titleMd,
-    color: Colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.palette.slate[900],
     marginBottom: 2,
   },
   userEmail: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    marginBottom: spacing.lg,
+    fontSize: 13,
+    color: Colors.palette.slate[500],
+    marginBottom: spacing.xl,
   },
-  logoutBtn: {
+  logoutButton: {
     width: '100%',
+    minHeight: 48,
+    backgroundColor: Colors.danger,
+    borderRadius: radius.md + 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.white,
   },
 });
 
