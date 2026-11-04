@@ -1,15 +1,16 @@
 /**
  * @file ForgotPasswordView.tsx
- * @desc Component View Khôi phục mật khẩu tài khoản UICV
+ * @desc Component View Khôi phục mật khẩu Clean UI, không emoji
  * @layer modules/auth/components
  */
 
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Colors } from '@/shared/constants/Colors';
 import { radius, spacing } from '@/shared/styles/tokens';
 import { AuthService } from '../services/auth.service';
 import { AuthInput } from './AuthInput';
+import { AlertIcon, CheckIcon, LockIcon } from './CleanIcons';
 
 export interface ForgotPasswordViewProps {
   onBackToLogin: () => void;
@@ -39,22 +40,22 @@ export const ForgotPasswordView: React.FC<ForgotPasswordViewProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Icon bảo mật */}
+      {/* Icon bảo mật vector tối giản */}
       <View style={styles.iconCircle}>
-        <Text style={styles.iconText}>🔐</Text>
+        <LockIcon color={Colors.primary} size={26} />
       </View>
 
       <Text style={styles.title}>Quên mật khẩu?</Text>
       <Text style={styles.description}>
         {isSuccess
-          ? `Liên kết đặt lại mật khẩu đã được gửi tới email ${email}. Vui lòng kiểm tra hộp thư đến (hoặc thư rác).`
-          : 'Đừng lo lắng! Nhập địa chỉ email đăng ký của bạn, hệ thống sẽ gửi liên kết khôi phục mật khẩu bảo mật.'}
+          ? `Liên kết đặt lại mật khẩu đã được gửi tới email ${email}. Vui lòng kiểm tra hộp thư đến.`
+          : 'Nhập địa chỉ email đăng ký của bạn, hệ thống sẽ gửi liên kết khôi phục mật khẩu bảo mật.'}
       </Text>
 
       {/* Thông báo thành công */}
       {isSuccess ? (
         <View style={styles.successBox}>
-          <Text style={styles.successIcon}>✅</Text>
+          <CheckIcon color={Colors.success} size={18} />
           <Text style={styles.successText}>
             Yêu cầu khôi phục đã được xử lý thành công!
           </Text>
@@ -64,7 +65,7 @@ export const ForgotPasswordView: React.FC<ForgotPasswordViewProps> = ({
           {/* Thông báo lỗi nếu có */}
           {Boolean(error) && (
             <View style={styles.errorBanner}>
-              <Text style={styles.errorBannerIcon}>⚠️</Text>
+              <AlertIcon color={Colors.danger} size={16} />
               <Text style={styles.errorBannerText}>{error}</Text>
             </View>
           )}
@@ -90,9 +91,11 @@ export const ForgotPasswordView: React.FC<ForgotPasswordViewProps> = ({
             style={[styles.submitButton, isLoading && styles.buttonDisabled]}
             onPress={handleSubmit}
           >
-            <Text style={styles.submitButtonText}>
-              {isLoading ? 'Đang gửi yêu cầu...' : 'Gửi liên kết khôi phục'}
-            </Text>
+            {isLoading ? (
+              <ActivityIndicator color={Colors.white} size="small" />
+            ) : (
+              <Text style={styles.submitButtonText}>Gửi liên kết khôi phục</Text>
+            )}
           </TouchableOpacity>
         </>
       )}
@@ -116,18 +119,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: Colors.palette.red[50],
     borderWidth: 1.5,
     borderColor: Colors.palette.red[200],
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
-  },
-  iconText: {
-    fontSize: 28,
   },
   title: {
     fontSize: 20,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
   submitButtonText: {
     fontSize: 16,
@@ -186,9 +186,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     gap: spacing.sm,
   },
-  errorBannerIcon: {
-    fontSize: 16,
-  },
   errorBannerText: {
     flex: 1,
     fontSize: 13,
@@ -207,9 +204,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.xl,
     gap: spacing.sm,
-  },
-  successIcon: {
-    fontSize: 18,
   },
   successText: {
     flex: 1,

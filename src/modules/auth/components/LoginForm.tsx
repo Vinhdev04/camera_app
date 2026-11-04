@@ -1,16 +1,17 @@
 /**
  * @file LoginForm.tsx
- * @desc Component Form Đăng nhập thiết kế chuẩn 1:1 theo bản mẫu Prototype SCR-11
+ * @desc Component Form Đăng nhập Clean UI, không emoji, chuẩn xác 1:1 theo bản mẫu SCR-11
  * @layer modules/auth/components
  */
 
 import React, { useState } from 'react';
-import { View, Text, Switch, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Switch, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Colors } from '@/shared/constants/Colors';
 import { Typography } from '@/shared/constants/Typography';
 import { radius, spacing } from '@/shared/styles/tokens';
 import { LoginCredentials } from '../types';
 import { AuthInput } from './AuthInput';
+import { AlertIcon, UserIcon } from './CleanIcons';
 
 export interface LoginFormProps {
   isLoading: boolean;
@@ -46,7 +47,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       {/* Banner thông báo lỗi nếu có */}
       {Boolean(errorMessage) && (
         <View style={styles.errorBanner}>
-          <Text style={styles.errorBannerIcon}>⚠️</Text>
+          <AlertIcon color={Colors.danger} size={16} />
           <Text style={styles.errorBannerText}>{errorMessage}</Text>
         </View>
       )}
@@ -77,7 +78,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <View style={styles.rememberWrap}>
           <Switch
             ios_backgroundColor={Colors.palette.slate[200]}
-            style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
+            style={{ transform: [{ scaleX: 0.88 }, { scaleY: 0.88 }] }}
             thumbColor={Colors.white}
             trackColor={{
               false: Colors.palette.slate[200],
@@ -105,10 +106,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         style={[styles.submitButton, isLoading && styles.buttonDisabled]}
         onPress={handleSubmit}
       >
-        <Text style={styles.loginIcon}>📥</Text>
-        <Text style={styles.submitButtonText}>
-          {isLoading ? 'Đang xác thực...' : 'Đăng nhập'}
-        </Text>
+        {isLoading ? (
+          <ActivityIndicator color={Colors.white} size="small" />
+        ) : (
+          <Text style={styles.submitButtonText}>Đăng nhập</Text>
+        )}
       </TouchableOpacity>
 
       {/* Phân cách LOGIN.OR */}
@@ -125,8 +127,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         style={styles.biometricButton}
         onPress={onBiometricLogin}
       >
-        <Text style={styles.biometricIcon}>🪪</Text>
-        <Text style={styles.biometricText}>Dùng Face ID</Text>
+        <UserIcon color={Colors.palette.slate[700]} size={16} />
+        <Text style={styles.biometricText}>Dùng Face ID / Vân tay</Text>
       </TouchableOpacity>
 
       {/* Ghi chú bảo mật Keychain/Keystore (SEC-002) */}
@@ -181,10 +183,8 @@ const styles = StyleSheet.create({
     minHeight: 50,
     backgroundColor: Colors.primary,
     borderRadius: radius.md + 4,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -193,16 +193,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   buttonDisabled: {
-    opacity: 0.6,
-  },
-  loginIcon: {
-    fontSize: 18,
-    color: Colors.white,
+    opacity: 0.7,
   },
   submitButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: Colors.white,
+    letterSpacing: 0.3,
   },
   orDivider: {
     flexDirection: 'row',
@@ -234,9 +231,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     marginBottom: spacing.lg + 2,
-  },
-  biometricIcon: {
-    fontSize: 18,
   },
   biometricText: {
     fontSize: 14,
@@ -278,9 +272,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     gap: spacing.sm,
-  },
-  errorBannerIcon: {
-    fontSize: 16,
   },
   errorBannerText: {
     flex: 1,

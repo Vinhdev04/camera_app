@@ -1,15 +1,16 @@
 /**
  * @file RegisterForm.tsx
- * @desc Component Form Đăng ký tài khoản UICV mới
+ * @desc Component Form Đăng ký tài khoản Clean UI, không emoji
  * @layer modules/auth/components
  */
 
 import React, { useState } from 'react';
-import { View, Text, Switch, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Switch, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Colors } from '@/shared/constants/Colors';
 import { radius, spacing } from '@/shared/styles/tokens';
 import { RegisterCredentials } from '../types';
 import { AuthInput } from './AuthInput';
+import { AlertIcon } from './CleanIcons';
 
 export interface RegisterFormProps {
   isLoading: boolean;
@@ -45,7 +46,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       {/* Banner thông báo lỗi nếu có */}
       {Boolean(errorMessage) && (
         <View style={styles.errorBanner}>
-          <Text style={styles.errorBannerIcon}>⚠️</Text>
+          <AlertIcon color={Colors.danger} size={16} />
           <Text style={styles.errorBannerText}>{errorMessage}</Text>
         </View>
       )}
@@ -94,7 +95,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <View style={styles.termsRow}>
         <Switch
           ios_backgroundColor={Colors.palette.slate[200]}
-          style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
+          style={{ transform: [{ scaleX: 0.88 }, { scaleY: 0.88 }] }}
           thumbColor={Colors.white}
           trackColor={{
             false: Colors.palette.slate[200],
@@ -119,9 +120,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         style={[styles.submitButton, isLoading && styles.buttonDisabled]}
         onPress={handleSubmit}
       >
-        <Text style={styles.submitButtonText}>
-          {isLoading ? 'Đang khởi tạo tài khoản...' : 'Đăng ký tài khoản'}
-        </Text>
+        {isLoading ? (
+          <ActivityIndicator color={Colors.white} size="small" />
+        ) : (
+          <Text style={styles.submitButtonText}>Đăng ký tài khoản</Text>
+        )}
       </TouchableOpacity>
 
       {/* Link quay lại màn hình đăng nhập */}
@@ -164,10 +167,8 @@ const styles = StyleSheet.create({
     minHeight: 50,
     backgroundColor: Colors.primary,
     borderRadius: radius.md + 4,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -176,12 +177,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
   submitButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: Colors.white,
+    letterSpacing: 0.3,
   },
   switchTabRow: {
     flexDirection: 'row',
@@ -209,9 +211,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     gap: spacing.sm,
-  },
-  errorBannerIcon: {
-    fontSize: 16,
   },
   errorBannerText: {
     flex: 1,

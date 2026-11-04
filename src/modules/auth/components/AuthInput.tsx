@@ -1,7 +1,7 @@
 /**
  * @file AuthInput.tsx
  * @desc Component Input chuyên dụng cho các form Xác thực (Đăng nhập / Đăng ký)
- * Tối ưu responsive, chuẩn xác theo bản thiết kế SCR-11
+ * Tối ưu responsive, chuẩn xác theo bản thiết kế SCR-11 và dùng Clean Vector Icons
  * @layer modules/auth/components
  */
 
@@ -17,6 +17,7 @@ import {
 import { Colors } from '@/shared/constants/Colors';
 import { Typography } from '@/shared/constants/Typography';
 import { radius, spacing } from '@/shared/styles/tokens';
+import { EyeIcon } from './CleanIcons';
 
 export interface AuthInputProps extends TextInputProps {
   label: string;
@@ -54,7 +55,7 @@ export const AuthInput: React.FC<AuthInputProps> = ({
             style={styles.toggleShowBtn}
             onPress={() => setShowPassword(!showPassword)}
           >
-            <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️'}</Text>
+            <EyeIcon color={Colors.primary} isOpen={showPassword} size={15} />
             <Text style={styles.toggleShowText}>
               {showPassword ? 'Hide' : 'Show'}
             </Text>
@@ -113,10 +114,7 @@ const styles = StyleSheet.create({
   toggleShowBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-  },
-  eyeIcon: {
-    fontSize: 13,
+    gap: 5,
   },
   toggleShowText: {
     fontSize: 12,

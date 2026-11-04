@@ -1,11 +1,11 @@
 /**
  * @file AuthScreen.tsx
- * @desc Màn hình Xác thực (Đăng nhập / Đăng ký / Quên mật khẩu) chuẩn theo UI Prototype SCR-11
- * Tối ưu responsive 100% trên cả thiết bị di động (360px - 440px) và tablet/web
+ * @desc Màn hình Xác thực Clean UI, không emoji, hỗ trợ Đăng nhập Tài khoản / Quét mã QR / Chế độ Cục bộ
+ * Tích hợp hiệu ứng chuyển cảnh Smooth Animated, Shimmer Skeleton và xử lý 404 Error State
  * @layer modules/auth/screens
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,17 +15,21 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Animated,
 } from 'react-native';
 import { Colors } from '@/shared/constants/Colors';
-import { Typography } from '@/shared/constants/Typography';
 import { radius, spacing } from '@/shared/styles/tokens';
 import { useAuth } from '../hooks/useAuth';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
 import { ForgotPasswordView } from '../components/ForgotPasswordView';
 import { LocalModeNotice } from '../components/LocalModeNotice';
+import { QrLoginView } from '../components/QrLoginView';
+import { AuthSkeleton } from '../components/AuthSkeleton';
+import { BackIcon, CameraIcon, QrIcon, UserIcon } from '../components/CleanIcons';
 
-export type AuthSubView = 'login' | 'register' | 'forgot-password';
+export type AuthMainTab = 'account' | 'qr' | 'local';
+export type AccountSubView = 'login' | 'register' | 'forgot-password';
 
 export interface AuthScreenProps {
   onNavigateBack: () => void;
@@ -39,10 +43,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const {
     user,
     isAuthenticated,
-    authMode,
     isLoading,
     error,
-    setAuthMode,
     clearError,
     login,
     register,
@@ -50,7 +52,53 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     logout,
   } = useAuth();
 
-  const [subView, setSubView] = useState<AuthSubView>('login');
+  const [mainTab, setMainTab] = useState<AuthMainTab>('account');
+  const [subView, setSubView] = useState<AccountSubView>('login');
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
+
+  // Animation mờ dần và trượt nhẹ khi chuyển view
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+
+  const triggerTransition = (callback: () => void) => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 8,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      callback();
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 180,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 180,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
+  };
+
+  const handleSwitchMainTab = (newTab: AuthMainTab) => {
+    if (newTab === mainTab) return;
+    clearError();
+    triggerTransition(() => setMainTab(newTab));
+  };
+
+  const handleSwitchSubView = (newView: AccountSubView) => {
+    clearError();
+    triggerTransition(() => setSubView(newView));
+  };
 
   // Xử lý đăng nhập thành công
   const handleLoginSubmit = async (credentials: any) => {
@@ -76,16 +124,25 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     }
   };
 
+  // Xử lý quét QR thành công
+  const handleQrSuccess = () => {
+    handleBiometricSubmit();
+  };
+
   const getPageTitle = () => {
-    if (subView === 'register') return 'Tạo tài khoản';
-    if (subView === 'forgot-password') return 'Quên mật khẩu';
-    return 'Đăng nhập';
+    if (mainTab === 'qr') return 'Đăng nhập bằng mã QR';
+    if (mainTab === 'local') return 'Chế độ mạng nội bộ';
+    if (subView === 'register') return 'Tạo tài khoản mới';
+    if (subView === 'forgot-password') return 'Khôi phục mật khẩu';
+    return 'Đăng nhập tài khoản';
   };
 
   const getPageSubtitle = () => {
-    if (subView === 'register') return 'Khởi tạo tài khoản để sao lưu cấu hình đám mây';
-    if (subView === 'forgot-password') return 'Khôi phục quyền truy cập vào tài khoản của bạn';
-    return 'Đồng bộ cấu hình và bật truy cập từ xa';
+    if (mainTab === 'qr') return 'Quét mã xác thực nhanh từ camera hoặc ứng dụng Web CMS';
+    if (mainTab === 'local') return 'Giám sát trực tiếp trong LAN, không cần tạo tài khoản đám mây';
+    if (subView === 'register') return 'Khởi tạo tài khoản UICV để sao lưu và đồng bộ cấu hình';
+    if (subView === 'forgot-password') return 'Nhận liên kết bảo mật để thiết lập lại mật khẩu';
+    return 'Đồng bộ cấu hình và bật quyền truy cập camera từ xa';
   };
 
   return (
@@ -106,15 +163,16 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                 activeOpacity={0.7}
                 style={styles.backButton}
                 onPress={() => {
-                  if (subView !== 'login') {
+                  if (mainTab !== 'account' || subView !== 'login') {
                     clearError();
+                    setMainTab('account');
                     setSubView('login');
                   } else {
                     onNavigateBack();
                   }
                 }}
               >
-                <Text style={styles.backIcon}>‹</Text>
+                <BackIcon color={Colors.palette.slate[800]} size={16} />
               </TouchableOpacity>
 
               <View style={styles.roadmapTag}>
@@ -122,11 +180,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
               </View>
             </View>
 
-            {/* 2. Cụm Logo & Nhận diện thương hiệu UICV */}
+            {/* 2. Cụm Logo & Nhận diện thương hiệu UICV (Clean UI, không emoji) */}
             <View style={styles.brandHeader}>
               <View style={styles.logoRow}>
                 <View style={styles.cameraIconBadge}>
-                  <Text style={styles.cameraIconSymbol}>📹</Text>
+                  <CameraIcon color={Colors.white} size={20} />
                 </View>
                 <View>
                   <Text style={styles.brandName}>UICV</Text>
@@ -138,109 +196,124 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
               <Text style={styles.pageSubtitle}>{getPageSubtitle()}</Text>
             </View>
 
-            {/* 3. Bộ chuyển Chế độ: Cục bộ | Tài khoản (Chỉ hiển thị khi không ở màn Forgot Password) */}
-            {subView !== 'forgot-password' && (
-              <View style={styles.segmentContainer}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
+            {/* 3. Segment Control 3 Tab mượt mà (Tài khoản | Quét QR | Cục bộ) */}
+            <View style={styles.segmentContainer}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.segmentButton,
+                  mainTab === 'account' && styles.segmentButtonActive,
+                ]}
+                onPress={() => handleSwitchMainTab('account')}
+              >
+                <Text
                   style={[
-                    styles.segmentButton,
-                    authMode === 'local' && styles.segmentButtonActive,
+                    styles.segmentText,
+                    mainTab === 'account' && styles.segmentTextActive,
                   ]}
-                  onPress={() => {
-                    clearError();
-                    setAuthMode('local');
-                  }}
                 >
-                  <Text
-                    style={[
-                      styles.segmentText,
-                      authMode === 'local' && styles.segmentTextActive,
-                    ]}
-                  >
-                    Cục bộ
-                  </Text>
-                </TouchableOpacity>
+                  Tài khoản
+                </Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity
-                  activeOpacity={0.8}
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.segmentButton,
+                  mainTab === 'qr' && styles.segmentButtonActive,
+                ]}
+                onPress={() => handleSwitchMainTab('qr')}
+              >
+                <Text
                   style={[
-                    styles.segmentButton,
-                    authMode === 'account' && styles.segmentButtonActive,
+                    styles.segmentText,
+                    mainTab === 'qr' && styles.segmentTextActive,
                   ]}
-                  onPress={() => {
-                    clearError();
-                    setAuthMode('account');
-                  }}
                 >
-                  <Text
-                    style={[
-                      styles.segmentText,
-                      authMode === 'account' && styles.segmentTextActive,
-                    ]}
-                  >
-                    Tài khoản
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+                  Mã QR
+                </Text>
+              </TouchableOpacity>
 
-            {/* 4. Nội dung theo trạng thái */}
-            {authMode === 'local' ? (
-              <LocalModeNotice onContinueLocal={onNavigateBack} />
-            ) : isAuthenticated && user ? (
-              /* Đã đăng nhập */
-              <View style={styles.userCard}>
-                <View style={styles.avatarCircle}>
-                  <Text style={styles.avatarSymbol}>👤</Text>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.segmentButton,
+                  mainTab === 'local' && styles.segmentButtonActive,
+                ]}
+                onPress={() => handleSwitchMainTab('local')}
+              >
+                <Text
+                  style={[
+                    styles.segmentText,
+                    mainTab === 'local' && styles.segmentTextActive,
+                  ]}
+                >
+                  Cục bộ
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* 4. Khung Nội dung có hiệu ứng Chuyển cảnh Smooth Animated */}
+            <Animated.View
+              style={{
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              }}
+            >
+              {isInitialLoading ? (
+                /* Skeleton Shimmer Loading */
+                <AuthSkeleton />
+              ) : mainTab === 'qr' ? (
+                /* Chế độ Đăng nhập bằng Mã QR */
+                <QrLoginView
+                  onQrLoginSuccess={handleQrSuccess}
+                  onSwitchToAccount={() => handleSwitchMainTab('account')}
+                />
+              ) : mainTab === 'local' ? (
+                /* Chế độ Cục bộ */
+                <LocalModeNotice onContinueLocal={onNavigateBack} />
+              ) : isAuthenticated && user ? (
+                /* Người dùng đã đăng nhập */
+                <View style={styles.userCard}>
+                  <View style={styles.avatarCircle}>
+                    <UserIcon color={Colors.primary} size={32} />
+                  </View>
+                  <Text style={styles.userName}>{user.name}</Text>
+                  <Text style={styles.userEmail}>{user.email}</Text>
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.logoutButton}
+                    onPress={logout}
+                  >
+                    <Text style={styles.logoutButtonText}>Đăng Xuất Tài Khoản</Text>
+                  </TouchableOpacity>
                 </View>
-                <Text style={styles.userName}>{user.name}</Text>
-                <Text style={styles.userEmail}>{user.email}</Text>
-
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  style={styles.logoutButton}
-                  onPress={logout}
-                >
-                  <Text style={styles.logoutButtonText}>Đăng Xuất Tài Khoản</Text>
-                </TouchableOpacity>
-              </View>
-            ) : subView === 'forgot-password' ? (
-              /* View Quên mật khẩu */
-              <ForgotPasswordView
-                onBackToLogin={() => {
-                  clearError();
-                  setSubView('login');
-                }}
-              />
-            ) : subView === 'register' ? (
-              /* View Đăng ký tài khoản */
-              <RegisterForm
-                errorMessage={error}
-                isLoading={isLoading}
-                onSubmit={handleRegisterSubmit}
-                onSwitchToLogin={() => {
-                  clearError();
-                  setSubView('login');
-                }}
-              />
-            ) : (
-              /* View Đăng nhập (Mặc định) */
-              <LoginForm
-                errorMessage={error}
-                isLoading={isLoading}
-                onBiometricLogin={handleBiometricSubmit}
-                onForgotPassword={() => {
-                  clearError();
-                  setSubView('forgot-password');
-                }}
-                onSubmit={handleLoginSubmit}
-                onSwitchToRegister={() => {
-                  clearError();
-                  setSubView('register');
-                }}
-              />
-            )}
+              ) : subView === 'forgot-password' ? (
+                /* View Quên mật khẩu */
+                <ForgotPasswordView
+                  onBackToLogin={() => handleSwitchSubView('login')}
+                />
+              ) : subView === 'register' ? (
+                /* View Đăng ký tài khoản */
+                <RegisterForm
+                  errorMessage={error}
+                  isLoading={isLoading}
+                  onSubmit={handleRegisterSubmit}
+                  onSwitchToLogin={() => handleSwitchSubView('login')}
+                />
+              ) : (
+                /* View Đăng nhập (Mặc định) */
+                <LoginForm
+                  errorMessage={error}
+                  isLoading={isLoading}
+                  onBiometricLogin={handleBiometricSubmit}
+                  onForgotPassword={() => handleSwitchSubView('forgot-password')}
+                  onSubmit={handleLoginSubmit}
+                  onSwitchToRegister={() => handleSwitchSubView('register')}
+                />
+              )}
+            </Animated.View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -282,12 +355,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backIcon: {
-    fontSize: 22,
-    color: Colors.palette.slate[800],
-    fontWeight: '600',
-    marginTop: -2,
-  },
   roadmapTag: {
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -304,7 +371,7 @@ const styles = StyleSheet.create({
   },
   brandHeader: {
     marginTop: spacing.sm,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md + 2,
   },
   logoRow: {
     flexDirection: 'row',
@@ -320,9 +387,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cameraIconSymbol: {
-    fontSize: 18,
-  },
   brandName: {
     fontSize: 16,
     fontWeight: '700',
@@ -337,7 +401,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   pageTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
     color: Colors.palette.slate[900],
     letterSpacing: -0.3,
@@ -371,7 +435,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   segmentText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
     color: Colors.palette.slate[600],
   },
@@ -398,9 +462,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
-  },
-  avatarSymbol: {
-    fontSize: 30,
   },
   userName: {
     fontSize: 18,

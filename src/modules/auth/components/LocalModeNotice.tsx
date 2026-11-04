@@ -1,15 +1,16 @@
 /**
  * @file LocalModeNotice.tsx
  * @desc Component UI hiển thị thông báo và cam kết trải nghiệm chế độ Cục bộ (LAN-first)
+ * Clean UI, không emoji
  * @layer modules/auth/components
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Button } from '@/shared/components';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors } from '@/shared/constants/Colors';
 import { Typography } from '@/shared/constants/Typography';
 import { radius, spacing } from '@/shared/styles/tokens';
+import { CameraIcon } from './CleanIcons';
 
 export interface LocalModeNoticeProps {
   onContinueLocal: () => void;
@@ -21,7 +22,7 @@ export const LocalModeNotice: React.FC<LocalModeNoticeProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.iconCircle}>
-        <Text style={styles.iconText}>🛡️</Text>
+        <CameraIcon color={Colors.primary} size={28} />
       </View>
 
       <Text style={styles.title}>Chế Độ Cục Bộ (LAN-First)</Text>
@@ -53,22 +54,23 @@ export const LocalModeNotice: React.FC<LocalModeNoticeProps> = ({
         </View>
       </View>
 
-      <Button
+      <TouchableOpacity
+        activeOpacity={0.85}
         style={styles.continueBtn}
-        title="Tiếp Tục Chế Độ Cục Bộ"
-        variant="primary"
         onPress={onContinueLocal}
-      />
+      >
+        <Text style={styles.continueBtnText}>Tiếp Tục Chế Độ Cục Bộ</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderWidth: 1.2,
+    borderColor: Colors.palette.slate[200],
     padding: spacing.xl,
     marginTop: spacing.md,
     alignItems: 'center',
@@ -77,33 +79,32 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: Colors.infoSubtle || '#E0F2FE',
+    backgroundColor: Colors.palette.red[50],
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
-  iconText: {
-    fontSize: 28,
-  },
   title: {
     ...Typography.titleSm,
-    color: Colors.textPrimary,
+    fontSize: 18,
+    color: Colors.palette.slate[900],
     textAlign: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   description: {
     ...Typography.body,
-    color: Colors.textSecondary,
+    fontSize: 13,
+    color: Colors.palette.slate[600],
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
     marginBottom: spacing.lg,
   },
   highlightBox: {
     width: '100%',
-    backgroundColor: Colors.surfaceSubtle,
+    backgroundColor: Colors.palette.slate[50],
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: Colors.borderSubtle,
+    borderColor: Colors.palette.slate[200],
     padding: spacing.md,
     marginBottom: spacing.xl,
     gap: spacing.sm,
@@ -121,11 +122,28 @@ const styles = StyleSheet.create({
   },
   featureText: {
     ...Typography.caption,
-    color: Colors.textPrimary,
+    fontSize: 12,
+    color: Colors.palette.slate[800],
     flex: 1,
+    lineHeight: 18,
   },
   continueBtn: {
     width: '100%',
+    minHeight: 50,
+    backgroundColor: Colors.primary,
+    borderRadius: radius.md + 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  continueBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.white,
   },
 });
 
