@@ -242,3 +242,4 @@ export const commonStyles = StyleSheet.create({
 });
 
 export default commonStyles;
+

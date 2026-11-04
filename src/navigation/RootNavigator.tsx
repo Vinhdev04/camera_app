@@ -17,12 +17,14 @@ import { MultiViewScreen } from '@/modules/multi-view';
 import { DiagnosticsScreen } from '@/modules/diagnostics';
 import { OnboardingScreen } from '@/modules/onboarding';
 import { SettingsScreen } from '@/modules/settings';
+import { AuthScreen } from '@/modules/auth';
 
 export const RootNavigator: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('dashboard');
   const [activeCamera, setActiveCamera] = useState<Camera | null>(null);
 
   const navigateToDashboard = () => setCurrentScreen('dashboard');
+  const navigateToAuth = () => setCurrentScreen('auth');
 
   return (
     <View style={styles.container}>
@@ -36,6 +38,7 @@ export const RootNavigator: React.FC = () => {
             setActiveCamera(null);
             setCurrentScreen('add-camera');
           }}
+          onNavigateToAuth={navigateToAuth}
           onNavigateToDiagnostics={(camera: Camera) => {
             setActiveCamera(camera);
             setCurrentScreen('diagnostics');
@@ -89,7 +92,17 @@ export const RootNavigator: React.FC = () => {
       )}
 
       {currentScreen === 'settings' && (
-        <SettingsScreen onNavigateBack={navigateToDashboard} />
+        <SettingsScreen
+          onNavigateToAuth={navigateToAuth}
+          onNavigateBack={navigateToDashboard}
+        />
+      )}
+
+      {currentScreen === 'auth' && (
+        <AuthScreen
+          onLoginSuccess={navigateToDashboard}
+          onNavigateBack={navigateToDashboard}
+        />
       )}
     </View>
   );

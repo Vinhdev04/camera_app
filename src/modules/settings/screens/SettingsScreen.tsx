@@ -14,9 +14,13 @@ import { styles } from './SettingsScreen.styles';
 
 export interface SettingsScreenProps {
   onNavigateBack: () => void;
+  onNavigateToAuth?: () => void;
 }
 
-export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateBack }) => {
+export const SettingsScreen: React.FC<SettingsScreenProps> = ({
+  onNavigateBack,
+  onNavigateToAuth,
+}) => {
   // Lấy state và hàm cập nhật cài đặt từ hook useSettings
   const { theme, transport, updateTheme, updateTransport, resetAllData } = useSettings();
   const [resetModalVisible, setResetModalVisible] = useState(false);
@@ -111,6 +115,20 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateBack }
           </View>
         </Card>
 
+        {/* Nhóm Tài khoản & Đồng bộ */}
+        <Text style={styles.groupTitle}>TÀI KHOẢN & ĐỒNG BỘ (PHASE 4)</Text>
+        <Card style={styles.card}>
+          <TouchableOpacity
+            style={styles.dangerRow}
+            onPress={onNavigateToAuth}
+          >
+            <Text style={[styles.rowLabel, { color: Colors.primary }]}>
+              👤 Đăng nhập / Quản lý tài khoản (SCR-11)
+            </Text>
+            <Text style={[styles.dangerArrow, { color: Colors.primary }]}>›</Text>
+          </TouchableOpacity>
+        </Card>
+
         {/* Nhóm Dữ liệu & Bảo mật */}
         <Text style={styles.groupTitle}>DỮ LIỆU & QUYỀN RIÊNG TƯ</Text>
         <Card style={styles.card}>
@@ -158,4 +176,3 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateBack }
 };
 
 export default SettingsScreen;
-

@@ -12,5 +12,5 @@ export type ScreenType =
   | 'live-view'
   | 'multi-view'
   | 'diagnostics'
-  | 'settings';
-
+  | 'settings'
+  | 'auth';
