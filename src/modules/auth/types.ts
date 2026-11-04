@@ -38,3 +38,4 @@ export interface AuthState {
   authMode: AuthMode;
   authTab: AuthTab;
 }
+

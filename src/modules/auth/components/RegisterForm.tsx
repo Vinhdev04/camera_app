@@ -1,15 +1,16 @@
 /**
  * @file RegisterForm.tsx
- * @desc Form tạo tài khoản UICV mới đồng bộ cấu hình đám mây
+ * @desc Component UI Form tạo tài khoản UICV mới
  * @layer modules/auth/components
  */
 
 import React, { useState } from 'react';
-import { View, Text, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, Switch, TouchableOpacity, StyleSheet } from 'react-native';
 import { Button, Input } from '@/shared/components';
 import { Colors } from '@/shared/constants/Colors';
+import { Typography } from '@/shared/constants/Typography';
+import { radius, spacing } from '@/shared/styles/tokens';
 import { RegisterCredentials } from '../types';
-import { styles } from './RegisterForm.styles';
 
 export interface RegisterFormProps {
   isLoading: boolean;
@@ -126,5 +127,64 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    marginTop: spacing.md,
+  },
+  termsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+    marginTop: -spacing.xs,
+  },
+  termsTextWrap: {
+    flex: 1,
+  },
+  termsText: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+  },
+  termsLink: {
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  submitBtn: {
+    width: '100%',
+    marginBottom: spacing.lg,
+  },
+  switchTabWrap: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  switchTabText: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+  },
+  switchTabLink: {
+    ...Typography.bodyBold,
+    color: Colors.primary,
+  },
+  errorBanner: {
+    backgroundColor: Colors.dangerSubtle || 'rgba(239, 68, 68, 0.1)',
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderError,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  errorBannerText: {
+    ...Typography.caption,
+    color: Colors.danger,
+    lineHeight: 18,
+  },
+});
 
 export default RegisterForm;

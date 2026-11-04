@@ -1,14 +1,15 @@
 /**
  * @file LocalModeNotice.tsx
- * @desc Hiển thị thông báo và cam kết trải nghiệm chế độ Cục bộ (LAN-first)
- * Người dùng không cần tạo tài khoản hay đăng nhập vẫn xem được camera trong LAN
+ * @desc Component UI hiển thị thông báo và cam kết trải nghiệm chế độ Cục bộ (LAN-first)
  * @layer modules/auth/components
  */
 
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Button } from '@/shared/components';
-import { styles } from './LocalModeNotice.styles';
+import { Colors } from '@/shared/constants/Colors';
+import { Typography } from '@/shared/constants/Typography';
+import { radius, spacing } from '@/shared/styles/tokens';
 
 export interface LocalModeNoticeProps {
   onContinueLocal: () => void;
@@ -61,5 +62,71 @@ export const LocalModeNotice: React.FC<LocalModeNoticeProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: spacing.xl,
+    marginTop: spacing.md,
+    alignItems: 'center',
+  },
+  iconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.infoSubtle || '#E0F2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  iconText: {
+    fontSize: 28,
+  },
+  title: {
+    ...Typography.titleSm,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  description: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: spacing.lg,
+  },
+  highlightBox: {
+    width: '100%',
+    backgroundColor: Colors.surfaceSubtle,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderSubtle,
+    padding: spacing.md,
+    marginBottom: spacing.xl,
+    gap: spacing.sm,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  featureBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.success,
+  },
+  featureText: {
+    ...Typography.caption,
+    color: Colors.textPrimary,
+    flex: 1,
+  },
+  continueBtn: {
+    width: '100%',
+  },
+});
 
 export default LocalModeNotice;
