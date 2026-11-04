@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surfaceSubtle,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -58,12 +58,13 @@ const styles = StyleSheet.create({
   title: {
     ...typography.titleMd,
     textAlign: 'center',
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   description: {
     ...typography.body,
     textAlign: 'center',
-    color: colors.textMuted,
+    color: colors.textSecondary,
     lineHeight: 20,
     marginBottom: spacing.lg,
   },

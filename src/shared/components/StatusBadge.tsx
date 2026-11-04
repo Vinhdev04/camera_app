@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, radius, spacing, typography } from '@/shared/styles/tokens';
+import { cameraStatusTokens, radius, spacing, typography } from '@/shared/styles/tokens';
 import { CameraStatus } from '@/shared/types';
 
 export interface StatusBadgeProps {
@@ -9,42 +9,12 @@ export interface StatusBadgeProps {
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, style }) => {
-  const getStatusConfig = () => {
-    switch (status) {
-      case 'online':
-        return {
-          color: colors.success,
-          label: 'Trực tiếp',
-          bg: 'rgba(16, 185, 129, 0.15)',
-        };
-      case 'connecting':
-        return {
-          color: colors.warning,
-          label: 'Đang nối...',
-          bg: 'rgba(245, 158, 11, 0.15)',
-        };
-      case 'error':
-        return {
-          color: colors.danger,
-          label: 'Lỗi',
-          bg: 'rgba(239, 68, 68, 0.15)',
-        };
-      case 'offline':
-      default:
-        return {
-          color: colors.offline,
-          label: 'Ngoại tuyến',
-          bg: 'rgba(107, 114, 128, 0.15)',
-        };
-    }
-  };
-
-  const config = getStatusConfig();
+  const config = cameraStatusTokens[status] || cameraStatusTokens.offline;
 
   return (
-    <View style={[styles.container, { backgroundColor: config.bg }, style]}>
-      <View style={[styles.dot, { backgroundColor: config.color }]} />
-      <Text style={[styles.text, { color: config.color }]}>{config.label}</Text>
+    <View style={[styles.container, { backgroundColor: config.bgColor }, style]}>
+      <View style={[styles.dot, { backgroundColor: config.dotColor }]} />
+      <Text style={[styles.text, { color: config.textColor }]}>{config.label}</Text>
     </View>
   );
 };

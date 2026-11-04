@@ -84,7 +84,7 @@ export const Modal: React.FC<ModalProps> = ({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,
@@ -100,11 +100,12 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.titleMd,
+    color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   description: {
     ...typography.body,
-    color: colors.textMuted,
+    color: colors.textSecondary,
     marginBottom: spacing.lg,
     lineHeight: 20,
   },

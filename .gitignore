@@ -10,6 +10,19 @@ task/
 *.docx
 *.pdf
 
+# Design Mockups & Images (theo yêu cầu không push ảnh và mockup lên git)
+demo_camera/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.bmp
+*.ico
+
+# Expo & Tools
+.expo/
+
 # Environment & Secrets
 .env
 .env*.local
@@ -27,4 +40,3 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
-

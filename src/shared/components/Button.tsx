@@ -45,10 +45,14 @@ export const Button: React.FC<ButtonProps> = ({
 
   const getTextStyle = () => {
     switch (variant) {
+      case 'secondary':
+        return styles.secondaryText;
       case 'ghost':
         return styles.ghostText;
+      case 'danger':
+      case 'primary':
       default:
-        return styles.primaryText;
+        return styles.whiteText;
     }
   };
 
@@ -67,7 +71,7 @@ export const Button: React.FC<ButtonProps> = ({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={colors.textPrimary} size="small" />
+        <ActivityIndicator color={colors.textInverse} size="small" />
       ) : (
         <>
           {icon}
@@ -82,20 +86,20 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 46, // Đảm bảo tap target >= 44pt theo chuẩn Accessibility
+    minHeight: 44, // Đảm bảo tap target >= 44pt theo chuẩn Accessibility WCAG
     borderRadius: radius.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm + 2,
     gap: spacing.sm,
   },
   primary: {
     backgroundColor: colors.primary,
   },
   secondary: {
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surfaceSubtle,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -111,7 +115,10 @@ const styles = StyleSheet.create({
   text: {
     ...typography.bodyBold,
   },
-  primaryText: {
+  whiteText: {
+    color: colors.textInverse,
+  },
+  secondaryText: {
     color: colors.textPrimary,
   },
   ghostText: {
